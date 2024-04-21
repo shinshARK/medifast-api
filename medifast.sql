@@ -22,7 +22,7 @@ INSERT INTO `article` VALUES (1, '4 Rekomendasi Obat Maag yang Ampuh', 'artikel2
 DROP TABLE IF EXISTS `doctor`;
 CREATE TABLE `doctor` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `nama` TEXT,
+  `name` TEXT,
   `photo` TEXT,
   `specialty` TEXT,
   `rating` TEXT,

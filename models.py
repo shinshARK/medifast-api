@@ -17,7 +17,7 @@ class Doctor(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
-    image = Column(String(255))
+    photo = Column(String(255))
     specialty = Column(String(255))
     rating = Column(String(255))
     favorited = Column(Integer)
