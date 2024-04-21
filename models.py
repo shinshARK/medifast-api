@@ -1,36 +1,36 @@
 from sqlalchemy import Boolean, Column, Integer, String, Text, Date
 from database import Base
 
-class Artikel(Base):
-    __tablename__ = 'artikel'
+class Article(Base):
+    __tablename__ = 'article'
 
-    id_artikel = Column(Integer, primary_key=True)
-    judul = Column(String(255))
-    foto = Column(String(255))
-    isi = Column(Text)
+    id = Column(Integer, primary_key=True)
+    title = Column(String(255))
+    photo = Column(String(255))
+    content = Column(Text)
     createdat = Column(Date)
     updatedat = Column(Date)
 
 # Define the Dokter model
-class Dokter(Base):
-    __tablename__ = 'dokter'
+class Doctor(Base):
+    __tablename__ = 'doctor'
 
-    id_dokter = Column(Integer, primary_key=True)
-    nama_dokter = Column(String(255))
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255))
     image = Column(String(255))
-    spesialis = Column(String(255))
+    specialty = Column(String(255))
     rating = Column(String(255))
     favorited = Column(Integer)
-    pengalaman = Column(Integer)
-    tentang = Column(String(255))
-    jadwal = Column(String(255))
+    experience = Column(Integer)
+    about = Column(String(255))
+    schedule = Column(String(255))
 
 # Define the User model
 class User(Base):
     __tablename__ = 'user'
 
-    id_user = Column(Integer, primary_key=True)
-    first_name = Column(String(255))
+    id = Column(Integer, primary_key=True)
+    firstname = Column(String(255))
     lastname = Column(String(255))
     email = Column(String(255))
     telephone = Column(String(255))
