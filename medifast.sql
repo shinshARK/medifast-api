@@ -51,7 +51,7 @@ CREATE TABLE `user` (
   `lastname` TEXT,
   `email` TEXT,
   `telephone` TEXT,
-  `password` TEXT
+  `hashed_password` TEXT
 );
 
 -- ----------------------------
