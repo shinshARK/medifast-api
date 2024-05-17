@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, Integer, String, Text, Date, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from database import Base
 from datetime import datetime
+from app.database import Base
 
 
 class User(Base):
@@ -13,6 +13,8 @@ class User(Base):
     email = Column(String(255))
     telephone = Column(String(255))
     hashed_password = Column()
+
+    tokens = relationship("Token", back_populates="user")
 
 class Token(Base):
     __tablename__ = "token"

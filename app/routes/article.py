@@ -1,12 +1,16 @@
+# routes/article.py
+
+# Libraries
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 from datetime import datetime
-from models import Article, User
-from ..schema import article_schema
-from database import get_db
-from dependencies import *
 from fastapi.responses import FileResponse
 import os
+# App
+from app.database import get_db
+from app.schema import article_schema
+from app.dependencies import *
+from app.models import Article, User
 
 article_router = APIRouter(prefix='/articles', tags=['articles'])
 
@@ -18,12 +22,6 @@ async def get_all_articles(db: Session = Depends(get_db)):
         "articles": articles,
     }
 
-# id = Column(Integer, primary_key=True)
-    # title = Column(String(255))
-    # photo = Column(String(255))
-    # content = Column(Text)
-    # created_at = Column(Date)
-    # updated_at = Column(Date)
 
 @article_router.post('/', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def create_article(
@@ -40,10 +38,12 @@ async def create_article(
 
     # Upload file
     try:
-        file = await file.read()
-        file_location = f"./photos/article_photos/{file.filename}"
+        photo_file = await file.read()
+        file_location = f"./app/photos/article_photos/{file.filename}"
+        current_directory = os.getcwd()
+        print("Current directory:", current_directory)
         with open(file_location, 'wb') as f:
-            f.write(file)
+            f.write(photo_file)
     except Exception:
         raise HTTPException(status_code=500, detail="Error uploading file")
     finally:
@@ -83,7 +83,7 @@ async def get_article(id: int, db: Session = Depends(get_db)):
 
 @article_router.get('/get_photo/{filename}', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def get_photo(filename: str):
-    path = f"./photos/article_photos"
+    path = f"./app/photos/article_photos"
     if not os.path.exists(path):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
     return FileResponse(path)

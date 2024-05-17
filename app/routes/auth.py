@@ -1,16 +1,18 @@
+# Libraries
 from datetime import timedelta, datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
-from database import SessionLocal
-from models import User, Token
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
-from ..schema import user_schema
-from dependencies import get_db, verify_password, create_access_token, create_refresh_token, get_hashed_password, JWTBearer
+# App
+from app.database import SessionLocal
+from app.models import User, Token
+from app.schema import user_schema
+from app.dependencies import get_db, verify_password, create_access_token, create_refresh_token, get_hashed_password, JWTBearer
 
 auth_router = APIRouter(
     prefix='/auth',
@@ -43,7 +45,7 @@ async def register(user: user_schema.CreateUserRequest,
 
     db.add(new_user)
     db.commit()
-    db.refresh()
+    db.refresh(new_user)
 
     return {
         "message": "User registered successfully",

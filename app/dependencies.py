@@ -1,13 +1,14 @@
+# Libraries
 from fastapi import HTTPException, Depends, Request, status
 from jose import JWTError, jwt
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from database import get_db
 from sqlalchemy.orm import Session
-import models
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Union, Any
-from database import get_db
+# App
+import app.models as models
+from app.database import get_db
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 hari
