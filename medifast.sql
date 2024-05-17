@@ -7,8 +7,8 @@ CREATE TABLE `article` (
   `title` TEXT,
   `photo` TEXT,
   `content` TEXT,
-  `createdat` DATE,
-  `updatedat` DATE
+  `created_at` DATE,
+  `updated_at` DATE
 );
 
 -- ----------------------------
@@ -62,4 +62,15 @@ INSERT INTO `user` VALUES (2, 'agus', 'william', 'agus@gmail.com', '0835478853',
 INSERT INTO `user` VALUES (3, 'rafi', 'ahmad', 'rafi@gmail.com', '0835478853', 'password');
 INSERT INTO `user` VALUES (4, 'odang', 'saluhi', 'odang@gmail.com', '0835478853', 'password');
 INSERT INTO `user` VALUES (5, 'budi', 'gunawan', 'budi@gmail.com', '0835478853', 'password');
+
+
+
+CREATE TABLE token (
+    `user_id` INTEGER NOT NULL,
+    `access_token` VARCHAR(450) PRIMARY KEY,
+    `refresh_token` VARCHAR(450) NOT NULL,
+    status BOOLEAN,
+    `created_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES user(id)
+);
 

@@ -4,9 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
+
 import models
-import auth
-from auth import get_current_user
+import routes.auth as auth
+from routes.auth import get_current_user
+from database import get_db
 
 app = FastAPI()
 app.include_router(auth.router)
@@ -29,12 +31,7 @@ class UserBase(BaseModel):
     firstname: str
     lastname: str
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
