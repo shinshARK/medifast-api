@@ -3,7 +3,7 @@
 -- ----------------------------
 DROP TABLE IF EXISTS `article`;
 CREATE TABLE `article` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
   `title` TEXT,
   `photo` TEXT,
   `content` TEXT,
@@ -21,7 +21,7 @@ INSERT INTO `article` VALUES (1, '4 Rekomendasi Obat Maag yang Ampuh', 'artikel2
 -- ----------------------------
 DROP TABLE IF EXISTS `doctor`;
 CREATE TABLE `doctor` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
   `name` TEXT,
   `photo` TEXT,
   `specialty` TEXT,
@@ -46,7 +46,7 @@ INSERT INTO `doctor` VALUES (5, 'Dr. Lilis', 'dokter_3.png', 'Dokter Umum', '4.5
 -- ----------------------------
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
   `firstname` TEXT,
   `lastname` TEXT,
   `email` TEXT,
