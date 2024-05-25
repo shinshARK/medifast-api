@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS `user_doctor_favorite`;
 
 -- Create the user table
 CREATE TABLE `user` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
   `firstname` TEXT,
   `lastname` TEXT,
   `email` TEXT,
@@ -27,7 +27,7 @@ CREATE TABLE `token` (
 
 -- Create the article table
 CREATE TABLE `article` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
   `title` TEXT,
   `author` TEXT,
   `photo` TEXT,
@@ -38,7 +38,7 @@ CREATE TABLE `article` (
 
 -- Create the doctor table without the `favorited` column
 CREATE TABLE `doctor` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
   `name` TEXT,
   `photo` TEXT,
   `specialty` TEXT,
@@ -50,7 +50,7 @@ CREATE TABLE `doctor` (
 
 -- Create the user_doctor_favorite table for the relationship between users and doctors
 CREATE TABLE `user_doctor_favorite` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
   `user_id` INTEGER,
   `doctor_id` INTEGER,
   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`),
