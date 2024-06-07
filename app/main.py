@@ -5,7 +5,8 @@ from pydantic import BaseModel
 from app.database import engine, SessionLocal
 from sqlalchemy.orm import Session
 import app.models as models
-from app.routes import auth, article
+from app.routes import auth, article, doctor
+
 
 app = FastAPI()
 
@@ -20,6 +21,7 @@ app.add_middleware(
 models.Base.metadata.create_all(bind=engine)
 app.include_router(auth.auth_router)
 app.include_router(article.article_router)
+app.include_router(doctor.doctor_router)
 
 @app.get("/")
 def read_root():
