@@ -74,7 +74,13 @@ async def login(request: user_schema.LoginUserRequest,
 
     return {
         "message": "Login Success",
-        "data": {"access_token": access, "refresh_token": refresh},
+        "user": {
+            "id": user.id,
+            "firstname": user.firstname,
+            "lastname": user.lastname,
+            "email": user.email
+        },
+        "tokens": {"access_token": access, "refresh_token": refresh},
     }
 
 
