@@ -46,7 +46,6 @@ class Doctor(Base):
     photo = Column(String(255))
     specialty = Column(String(255))
     rating = Column(String(255))
-    favorited = Column(Integer)
     experience = Column(Integer)
     about = Column(String(255))
     schedule = Column(String(255))
