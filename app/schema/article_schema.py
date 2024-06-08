@@ -1,13 +1,23 @@
-# # schema/article_schema.py
+from fastapi import File, UploadFile, Form
 
-# from pydantic import BaseModel
-# from fastapi import Form, UploadFile, File
+from pydantic import BaseModel
+from typing import List
+from datetime import datetime
 
-# class CreateArticleRequest(BaseModel):
-#     title: str = Form(...),
-#     author: str = Form(...),
-#     content: str = Form(...),
-#     file: UploadFile = File(...)
+class ArticleBase(BaseModel):
+    title: str
+    author: str
+    photo: str
+    content: str
 
-#     class Config:
-#         from_attributes = True
+
+class ArticleCreateSchema(ArticleBase):
+    title: str = Form(...),
+    author: str = Form(...),
+    content: str = Form(...),
+    file: UploadFile = File(...),
+
+    class Config:
+        orm_mode = True
+        
+    

@@ -25,7 +25,7 @@ async def get_all_doctor(db: Session = Depends(get_db)):
 async def create_doctor(
     name: str = Form(...),
     file: UploadFile = File(...),
-    speciality: str = Form(...),
+    specialty: str = Form(...),
     rating: str = Form(...),
     experience: int = Form(...),
     about: str = Form(...),
@@ -35,7 +35,7 @@ async def create_doctor(
 ):
     existing_doctor = db.query(Doctor).filter(Doctor.name == name).first()
     if existing_doctor:
-        raise HTTPException(status_code=stastus.HTTP_409_CONFLICT, detail="Title already exists")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Title already exists")
     
     # UPLOAD FILE
     try:
@@ -52,13 +52,12 @@ async def create_doctor(
         
     new_doctor = Doctor(
         name=name,
-        speciality=speciality,
+        specialty=specialty,
         rating=rating,
         experience=experience,
         about=about,
         schedule=schedule,
-        created_at=datetime.now(),
-        updated_at=datetime.now(),
+
         photo=file.filename
     )
     db.add(new_doctor)
@@ -74,9 +73,9 @@ async def create_doctor(
         },
     }
     
-@doctor_router.get('/{id}', response_model=dict, dependencies=[Depends(JWTBearer())])
+@doctor_router.get('/{id}', dependencies=[Depends(JWTBearer())])
 async def get_doctor(id: int, db:Session = Depends(get_db)):
-    doctor = db.query(doctor).filter(doctor.id == id).first()
+    doctor = db.query(Doctor).filter(Doctor.id == id).first()
     if doctor is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="doctor not found")
     return {

@@ -35,7 +35,7 @@ CREATE TABLE `doctor` (
 
 INSERT INTO `doctor` (`id`, `name`, `photo`, `specialty`, `rating`, `experience`, `about`, `schedule`) VALUES ('1', 'Dr. Eki Rakhmah Z, Sp.A', 'dokter_1.png', 'Dokter Anak', '4.8', '1', 'apa ini 1', 'senin, 07:00 - 08:00');
 INSERT INTO `doctor` (`id`, `name`, `photo`, `specialty`, `rating`, `experience`, `about`, `schedule`) VALUES ('2', 'Dr. Yudi Heriyanto', 'dokter_4.png', 'Dokter Umum', '4.2', '2', 'apa ini 2', 'selasa, 07:00 - 08:00');
-INSERT INTO `doctor` (`id`, `name`, `photo`, `specialty`, `rating`, `experience`, `about`, `schedule`) VALUES ('3', 'Dr. Rina wijaya', null, 'Dokter Dalam', '4.8', '10', 'apa ini 3', 'rabu, 07:00 - 08:00');
+INSERT INTO `doctor` (`id`, `name`, `photo`, `specialty`, `rating`, `experience`, `about`, `schedule`) VALUES ('3', 'Dr. Rina wijaya', 'dokter_2.png', 'Dokter Dalam', '4.8', '10', 'apa ini 3', 'rabu, 07:00 - 08:00');
 
 
 -- ----------------------------

@@ -1,28 +1,23 @@
-# routes/article.py
-
-# Libraries
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form, status
 from sqlalchemy.orm import Session
-from datetime import datetime
 from fastapi.responses import FileResponse
 import os
-# App
+from datetime import datetime
+
+from app.dependencies import JWTBearer, get_current_user
 from app.database import get_db
-from app.schema import article_schema
-from app.dependencies import *
 from app.models import Article, User
+from app.schema.article_schema import ArticleCreateSchema
 
 article_router = APIRouter(prefix='/articles', tags=['articles'])
 
 @article_router.get('/', dependencies=[Depends(JWTBearer())])
 async def get_all_articles(db: Session = Depends(get_db)):
     articles = db.query(Article).all()
-    return {
-        "message": "Articles retrieved successfully",
-        "articles": articles,
-    }
-
-
+    return articles
+# async def get_all_articles(db: Session = Depends(get_db)):
+#     articles = db.query(Article).all()
+#     return ArticlesListSchema(articles=articles)
 @article_router.post('/', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def create_article(
     title: str = Form(...),
@@ -70,24 +65,17 @@ async def create_article(
         },
     }
 
-@article_router.get('/{id}', response_model=dict, dependencies=[Depends(JWTBearer())])
+@article_router.get('/{id}', dependencies=[Depends(JWTBearer())])
 async def get_article(id: int, db: Session = Depends(get_db)):
     article = db.query(Article).filter(Article.id == id).first()
     if article is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
 
-    return {
-        "message": "Article retrieved successfully",
-        "article": article
-    }
+    return article
 
 @article_router.get('/get_photo/{filename}', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def get_photo(filename: str):
-    path = f"./app/photos/article_photos"
+    path = f"./app/photos/article_photos/{filename}"
     if not os.path.exists(path):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
     return FileResponse(path)
-
-# TODO:
-# Implement Update Endpoint (Put)
-# Implement Delete Endpoint
