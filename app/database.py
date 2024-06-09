@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 # Define the SQLite database URL
-SQLALCHEMY_DATABASE_URL = "sqlite:///db_medifast.db"  # Replace with the path to your SQLite database file
+SQLALCHEMY_DATABASE_URL = "sqlite:///medifastfrfr.db"  # Replace with the path to your SQLite database file
 
 # Create a SQLAlchemy engine
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})

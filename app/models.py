@@ -50,17 +50,19 @@ class Doctor(Base):
     rating = Column(String(255))
     experience = Column(Integer)
     about = Column(String(255))
-    schedule = Column(String(255))
-    spesialis_id = Column(Integer, ForeignKey('spesialis.id'), nullable=False)
+    # schedule = Column(String(255))
+    id_spesialis = Column(Integer, ForeignKey('spesialis.id_spesialis'), nullable=False)
     spesialis = relationship("Specialty", back_populates="doctors")
     user_doctor_favorite = relationship("UserDoctorFavorite", back_populates="doctor")
-    shift = relationship("DoctorShift", back_populates="doctor")
+    doctor_shift = relationship("DoctorShift", back_populates="doctor")
+    resep_digital = relationship("ResepDigital", back_populates="doctor")
+    riwayat_transaksi = relationship("RiwayatTransaksi", back_populates="doctor")
 
 
 # Define the Specialty model
 class Specialty(Base):
     __tablename__ = 'spesialis'
-    id = Column(Integer, primary_key=True)
+    id_spesialis = Column(Integer, primary_key=True)
     nama_spesialis = Column(String(255))
     doctors = relationship("Doctor", back_populates="spesialis")
 
@@ -78,7 +80,7 @@ class UserDoctorFavorite(Base):
 # Define the Shift model
 class Shift(Base):
     __tablename__ = 'shift'
-    id = Column(Integer, primary_key=True)
+    id_shift = Column(Integer, primary_key=True)
     hari = Column(String(255))
     tipe_shift = Column(String(255))
     doctor_shift = relationship("DoctorShift", back_populates="shift")
@@ -87,9 +89,9 @@ class Shift(Base):
 # Define the DoctorShift model
 class DoctorShift(Base):
     __tablename__ = 'doctor_shift'
-    id = Column(Integer, primary_key=True)
-    doctor_id = Column(Integer, ForeignKey('doctor.id'))
-    shift_id = Column(Integer, ForeignKey('shift.id'))
+    id_doctor_shift = Column(Integer, primary_key=True)
+    id_doctor = Column(Integer, ForeignKey('doctor.id'))
+    id_shift = Column(Integer, ForeignKey('shift.id_shift'))
     doctor = relationship("Doctor", back_populates="doctor_shift")
     shift = relationship("Shift", back_populates="doctor_shift")
     antrian = relationship("Antrian", back_populates="doctor_shift")
@@ -98,30 +100,32 @@ class DoctorShift(Base):
 # Define the Antrian model
 class Antrian(Base):
     __tablename__ = 'antrian'
-    id = Column(Integer, primary_key=True)
+    id_antrian = Column(Integer, primary_key=True)
     tanggal = Column(Date)
     current_antrian = Column(Integer)
     max_antrian = Column(Integer)
-    doctor_shift_id = Column(Integer, ForeignKey('doctor_shift.id'))
+    id_doctor_shift = Column(Integer, ForeignKey('doctor_shift.id_shift'))
     doctor_shift = relationship("DoctorShift", back_populates="antrian")
+    riwayat_transaksi = relationship("RiwayatTransaksi", back_populates="antrian")
 
 
 # Define the Pasien model
 class Pasien(Base):
     __tablename__ = 'pasien'
-    id = Column(Integer, primary_key=True)
+    id_pasien = Column(Integer, primary_key=True)
     nama_pasien = Column(String(255))
     umur = Column(Integer)
     jenis_kelamin = Column(String(255))
     keluhan = Column(String(255))
     alamat = Column(String(255))
     riwayat_transaksi = relationship("RiwayatTransaksi", back_populates="pasien")
+    resep_digital = relationship("ResepDigital", back_populates="pasien")
 
 
 # Define the CatatanDokter model
 class CatatanDokter(Base):
     __tablename__ = 'catatan_doctor'
-    id = Column(Integer, primary_key=True)
+    id_catatan_doctor = Column(Integer, primary_key=True)
     gejala = Column(String(255))
     diagnosa = Column(String(255))
     riwayat_transaksi = relationship("RiwayatTransaksi", back_populates="catatan_doctor")
@@ -130,10 +134,10 @@ class CatatanDokter(Base):
 # Define the ResepDigital model
 class ResepDigital(Base):
     __tablename__ = 'resep_digital'
-    id = Column(Integer, primary_key=True)
+    id_resep_digital = Column(Integer, primary_key=True)
     doctor_id = Column(Integer, ForeignKey('doctor.id'))
-    pasien_id = Column(Integer, ForeignKey('pasien.id'))
-    obat_id = Column(Integer, ForeignKey('obat.id'))
+    pasien_id = Column(Integer, ForeignKey('pasien.id_pasien'))
+    obat_id = Column(Integer, ForeignKey('obat.id_obat'))
     doctor = relationship("Doctor", back_populates="resep_digital")
     pasien = relationship("Pasien", back_populates="resep_digital")
     obat = relationship("Obat", back_populates="resep_digital")
@@ -143,7 +147,7 @@ class ResepDigital(Base):
 # Define the Obat model
 class Obat(Base):
     __tablename__ = 'obat'
-    id = Column(Integer, primary_key=True)
+    id_obat = Column(Integer, primary_key=True)
     nama_obat = Column(String(255))
     tipe = Column(String(255))
     harga_satuan = Column(String(255))
@@ -153,17 +157,17 @@ class Obat(Base):
 # Define the RiwayatTransaksi model
 class RiwayatTransaksi(Base):
     __tablename__ = 'riwayat_transaksi'
-    id = Column(Integer, primary_key=True)
+    id_riwayat_transaksi = Column(Integer, primary_key=True)
     status = Column(String(255))
     jam = Column(String(255))
     doctor_id = Column(Integer, ForeignKey('doctor.id'))
-    pasien_id = Column(Integer, ForeignKey('pasien.id'))
-    antrian_id = Column(Integer, ForeignKey('antrian.id'))
+    pasien_id = Column(Integer, ForeignKey('pasien.id_pasien'))
+    antrian_id = Column(Integer, ForeignKey('antrian.id_antrian'))
     tipe_pembayaran = Column(String(255))
     jumlah_pembayaran = Column(String(255))
     user_id = Column(Integer, ForeignKey('user.id'))
-    resep_digital_id = Column(Integer, ForeignKey('resep_digital.id'))
-    catatan_doctor_id = Column(Integer, ForeignKey('catatan_doctor.id'))
+    resep_digital_id = Column(Integer, ForeignKey('resep_digital.id_resep_digital'))
+    catatan_doctor_id = Column(Integer, ForeignKey('catatan_doctor.id_catatan_doctor'))
     doctor = relationship("Doctor", back_populates="riwayat_transaksi")
     pasien = relationship("Pasien", back_populates="riwayat_transaksi")
     antrian = relationship("Antrian", back_populates="riwayat_transaksi")
