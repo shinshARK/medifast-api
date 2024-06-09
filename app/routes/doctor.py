@@ -9,7 +9,7 @@ import os
 # App
 from app.database import get_db
 from app.dependencies import *
-from app.models import Doctor, User
+from app.models import Doctor, User, UserDoctorFavorite
 
 doctor_router = APIRouter(prefix='/doctor', tags=['doctor'])
 
@@ -90,6 +90,17 @@ async def get_photo(filename: str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
     return FileResponse(path)
     
+    
+@doctor_router.get('/favorite/{userId}', dependencies=[Depends(JWTBearer())])
+async def get_favorite(userId: int, db: Session = Depends(get_db)):
+    favorites = db.query(UserDoctorFavorite).filter(UserDoctorFavorite.user_id == userId).all()
+    if favorites is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Favorites not found")
+    return {"favorites": favorites}
+
 # TODO:
 # Implement Update Endpoint (Put)
 # Implement Delete Endpoint
+# Implement Update Favorites
+# @doctor_router.post
+        
