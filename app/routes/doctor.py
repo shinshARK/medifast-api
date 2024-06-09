@@ -9,7 +9,7 @@ import os
 # App
 from app.database import get_db
 from app.dependencies import *
-from app.models import Antrian, Doctor, DoctorShift, User, UserDoctorFavorite
+from app.models import Antrian, Doctor, DoctorShift, Shift, User, UserDoctorFavorite
 
 doctor_router = APIRouter(prefix='/doctor', tags=['doctor'])
 
@@ -85,8 +85,15 @@ async def get_doctor(id: int, db:Session = Depends(get_db)):
     doctor_shifts_data = []
     for shift in doctor_shifts:
         queue = db.query(Antrian).filter(Antrian.id_doctor_shift == shift.id_doctor_shift).all()
-        shift_data = shift.__dict__
-        shift_data["antrian"] = queue
+        print(shift.id_shift)
+        shift_type = db.query(Shift).filter(Shift.id_shift == shift.id_shift).first()
+
+        shift_data = {
+            **shift.__dict__,
+            "shift_type": shift_type.__dict__,
+            "antrian": queue,
+        }
+
         doctor_shifts_data.append(shift_data)
     
     return {
