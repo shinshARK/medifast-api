@@ -175,3 +175,6 @@ class RiwayatTransaksi(Base):
     resep_digital = relationship("ResepDigital", back_populates="riwayat_transaksi")
     catatan_doctor = relationship("CatatanDokter", back_populates="riwayat_transaksi")
 
+def model_to_dict(model):
+    """Convert SQLAlchemy model instance to dictionary."""
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
