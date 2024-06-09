@@ -81,16 +81,17 @@ async def get_doctor(id: int, db:Session = Depends(get_db)):
     if doctor is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="doctor not found")
     
-    shifts = db.query(DoctorShift).filter(DoctorShift.doctor_id == id).all()
-    queue = []
-    for shift in shifts:
-        queue.extend(db.query(Antrian).filter(Antrian.id_dokter_shift == shift.id).all())
+    doctor_shifts = db.query(DoctorShift).filter(DoctorShift.id_doctor == id).all()
+    doctor_shifts_data = []
+    for shift in doctor_shifts:
+        queue = db.query(Antrian).filter(Antrian.id_doctor_shift == shift.id_doctor_shift).all()
+        shift_data = shift.__dict__
+        shift_data["antrian"] = queue
+        doctor_shifts_data.append(shift_data)
     
     return {
-        "message": "Doctor retrieved successfully",
-        "doctor": doctor,
-        "shifts": shifts,
-        "queue": queue
+        "doctor": doctor.__dict__,
+        "doctor_shifts": doctor_shifts_data,
     }
 
 
