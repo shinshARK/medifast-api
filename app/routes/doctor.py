@@ -9,7 +9,7 @@ import os
 # App
 from app.database import get_db
 from app.dependencies import *
-from app.models import Doctor, User, UserDoctorFavorite
+from app.models import Antrian, Doctor, DoctorShift, User, UserDoctorFavorite
 
 doctor_router = APIRouter(prefix='/doctor', tags=['doctor'])
 
@@ -73,15 +73,26 @@ async def create_doctor(
         },
     }
     
+    
+# detail dokter 
 @doctor_router.get('/{id}', dependencies=[Depends(JWTBearer())])
 async def get_doctor(id: int, db:Session = Depends(get_db)):
     doctor = db.query(Doctor).filter(Doctor.id == id).first()
     if doctor is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="doctor not found")
+    
+    shifts = db.query(DoctorShift).filter(DoctorShift.doctor_id == id).all()
+    queue = []
+    for shift in shifts:
+        queue.extend(db.query(Antrian).filter(Antrian.id_dokter_shift == shift.id).all())
+    
     return {
         "message": "Doctor retrieved successfully",
-        "doctor": doctor
+        "doctor": doctor,
+        "shifts": shifts,
+        "queue": queue
     }
+
 
 @doctor_router.get('/get_photo/{filename}', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def get_photo(filename: str):
