@@ -97,7 +97,7 @@ async def get_doctor(id: int, db:Session = Depends(get_db)):
 
 @doctor_router.get('/get_photo/{filename}', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def get_photo(filename: str):
-    path = f"./app/photos/doctor_photos"
+    path = f"./app/photos/doctor_photos/{filename}"
     if not os.path.exists(path):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
     return FileResponse(path)
