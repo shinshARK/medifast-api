@@ -148,7 +148,7 @@ async def update_transaction(
     transaction.jumlah_pembayaran = jumlah_pembayaran
     transaction.user_id = id_user
     transaction.resep_digital_id = id_resep_digital
-    transaction.catatan_doctor_id = id_catatan_dokter
+    transaction.catatan_doctor_id = id_catatan_doctor
     
     db.commit()
     db.refresh(transaction)
