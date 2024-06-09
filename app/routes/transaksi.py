@@ -1,14 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import select
 from datetime import datetime
 from fastapi.responses import FileResponse
 import os
 # App
 from app.database import get_db
 from app.dependencies import *
-from app.models import RiwayatTransaksi, Doctor, Pasien, Antrian, ResepDigital, CatatanDokter
+from app.models import RiwayatTransaksi, Doctor, Pasien, Antrian, ResepDigital, CatatanDokter, User, model_to_dict
 
 transaction_router = APIRouter(prefix='/transaction', tags=['transaction'])
+
+
 
 # CREATE a new transaction
 @transaction_router.post('/', response_model=dict, dependencies=[Depends(JWTBearer())])
@@ -47,35 +50,74 @@ async def create_transaction(
     }
 
 # READ all transactions with join
+# @transaction_router.get('/', dependencies=[Depends(JWTBearer())])
+# async def get_all_transactions(db: Session = Depends(get_db)):
+#     transactions = (
+#         db.query(RiwayatTransaksi)
+#         .join(RiwayatTransaksi.doctor)
+#         .join(RiwayatTransaksi.pasien)
+#         .join(RiwayatTransaksi.antrian)
+#         .join(RiwayatTransaksi.resep_digital)
+#         .join(RiwayatTransaksi.catatan_doctor)
+#         .all()
+#     )
+#     return {"message": "Transactions retrieved successfully", "transactions": transactions}
+
 @transaction_router.get('/', dependencies=[Depends(JWTBearer())])
-async def get_all_transactions(db: Session = Depends(get_db)):
+async def get_all_transactions_by_user(user_id: int, db: Session = Depends(get_db)):
+
+    # Execute the SQL statement to fetch all transactions for the user
     transactions = (
         db.query(RiwayatTransaksi)
-        .join(Doctor)
-        .join(Pasien)
-        .join(Antrian)
-        .join(ResepDigital)
-        .join(CatatanDokter)
+        .filter(RiwayatTransaksi.id_user == user_id)
         .all()
     )
-    return {"message": "Transactions retrieved successfully", "transactions": transactions}
+
+    # Initialize lists to store details related to each transaction
+    formatted_transactions = []
+    for transaction in transactions:
+        # Fetch details related to each transaction
+        user = db.query(User).filter(User.id == user_id).first()
+        resep_digital = db.query(ResepDigital).filter(ResepDigital.id_resep_digital == transaction.id_resep_digital).first()
+        catatan_dokter = db.query(CatatanDokter).filter(CatatanDokter.id_catatan_doctor == transaction.id_catatan_dokter).first()
+        doctor = db.query(Doctor).filter(Doctor.id == transaction.id_doctor).first()
+        pasien = db.query(Pasien).filter(Pasien.id_pasien == transaction.id_pasien).first()
+        antrian = db.query(Antrian).filter(Antrian.id_antrian == transaction.id_antrian).first()
+
+        # Construct a dictionary with details of the transaction and related entities
+        formatted_transaction = {
+            "transaction": model_to_dict(transaction),
+            "transaction_details": {
+                "user": model_to_dict(user),
+                "resep_digital": model_to_dict(resep_digital),
+                "catatan_dokter": model_to_dict(catatan_dokter),
+                "doctor": model_to_dict(doctor),
+                "pasien": model_to_dict(pasien),
+                "antrian": model_to_dict(antrian),    
+            }
+        }
+
+        # Append the formatted transaction to the list
+        formatted_transactions.append(formatted_transaction)
+
+    return {"message": "Transactions retrieved successfully", "transactions": formatted_transactions}
 
 # READ a specific transaction by ID with join
-@transaction_router.get('/{transaction_id}', dependencies=[Depends(JWTBearer())])
-async def get_transaction(transaction_id: int, db: Session = Depends(get_db)):
-    transaction = (
-        db.query(RiwayatTransaksi)
-        .filter(RiwayatTransaksi.id == transaction_id)
-        .join(Doctor)
-        .join(Pasien)
-        .join(Antrian)
-        .join(ResepDigital)
-        .join(CatatanDokter)
-        .first()
-    )
-    if not transaction:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-    return {"message": "Transaction retrieved successfully", "transaction": transaction}
+# @transaction_router.get('/{transaction_id}', dependencies=[Depends(JWTBearer())])
+# async def get_transaction(transaction_id: int, db: Session = Depends(get_db)):
+#     transaction = (
+#         db.query(RiwayatTransaksi)
+#         .filter(RiwayatTransaksi.id == transaction_id)
+#         .join(Doctor)
+#         .join(Pasien)
+#         .join(Antrian)
+#         .join(ResepDigital)
+#         .join(CatatanDokter)
+#         .first()
+#     )
+#     if not transaction:
+#         raise HTTPException(status_code=404, detail="Transaction not found")
+#     return {"message": "Transaction retrieved successfully", "transaction": transaction}
 
 # UPDATE a transaction by ID
 @transaction_router.put('/{transaction_id}', response_model=dict, dependencies=[Depends(JWTBearer())])
@@ -90,7 +132,7 @@ async def update_transaction(
     jumlah_pembayaran: str,
     id_user: int,
     id_resep_digital: int,
-    id_catatan_dokter: int,
+    id_catatan_doctor: int,
     db: Session = Depends(get_db)
 ):
     transaction = db.query(RiwayatTransaksi).filter(RiwayatTransaksi.id == transaction_id).first()
