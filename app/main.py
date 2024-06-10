@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from app.database import engine, SessionLocal
 from sqlalchemy.orm import Session
 import app.models as models
-from app.routes import auth, article, doctor, transaksi
+from app.routes import auth, article, doctor, transaksi, pasien
 
 
 app = FastAPI()
@@ -23,6 +23,7 @@ app.include_router(auth.auth_router)
 app.include_router(article.article_router)
 app.include_router(doctor.doctor_router)
 app.include_router(transaksi.transaction_router)
+app.include_router(pasien.pasien_router)
 
 @app.get("/")
 def read_root():
