@@ -13,41 +13,45 @@ transaction_router = APIRouter(prefix='/transaction', tags=['transaction'])
 
 
 
-# CREATE a new transaction
 @transaction_router.post('/', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def create_transaction(
-    status: str,
-    jam: str,
-    id_doctor: int,
-    id_pasien: int,
-    id_antrian: int,
-    tipe_pembayaran: str,
-    jumlah_pembayaran: str,
-    id_user: int,
-    id_resep_digital: int,
-    id_catatan_dokter: int,
+    status: str = Form(...),
+    jam: str = Form(...),
+    id_doctor: int = Form(...),
+    id_pasien: int = Form(...),
+    id_antrian: int = Form(...),
+    tipe_pembayaran: str = Form(...),
+    jumlah_pembayaran: str = Form(...),
+    id_user: int = Form(...),
+    id_resep_digital: int = Form(...),
+    id_catatan_dokter: int = Form(...),
     db: Session = Depends(get_db)
 ):
-    new_transaction = RiwayatTransaksi(
-        status=status,
-        jam=jam,
-        doctor_id=id_doctor,
-        pasien_id=id_pasien,
-        antrian_id=id_antrian,
-        tipe_pembayaran=tipe_pembayaran,
-        jumlah_pembayaran=jumlah_pembayaran,
-        user_id=id_user,
-        resep_digital_id=id_resep_digital,
-        catatan_doctor_id=id_catatan_dokter
-    )
-    db.add(new_transaction)
-    db.commit()
-    db.refresh(new_transaction)
-    
+    print(f"Received data: status={status}, jam={jam}, id_doctor={id_doctor}, id_pasien={id_pasien}, id_antrian={id_antrian}, tipe_pembayaran={tipe_pembayaran}, jumlah_pembayaran={jumlah_pembayaran}, id_user={id_user}, id_resep_digital={id_resep_digital}, id_catatan_dokter={id_catatan_dokter}")
+    try:
+        new_transaction = RiwayatTransaksi(
+            status=status,
+            jam=jam,
+            id_doctor=id_doctor,
+            id_pasien=id_pasien,
+            id_antrian=id_antrian,
+            tipe_pembayaran=tipe_pembayaran,
+            jumlah_pembayaran=jumlah_pembayaran,
+            id_user=id_user,
+            id_resep_digital=id_resep_digital,
+            id_catatan_dokter=id_catatan_dokter
+        )
+        db.add(new_transaction)
+        db.commit()
+        db.refresh(new_transaction)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating transaction: {e}")
+
     return {
         "message": "Transaction created successfully",
         "data": new_transaction
     }
+
 
 # READ all transactions with join
 # @transaction_router.get('/', dependencies=[Depends(JWTBearer())])
