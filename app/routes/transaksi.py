@@ -11,7 +11,16 @@ from app.models import RiwayatTransaksi, Doctor, Pasien, Antrian, ResepDigital, 
 
 transaction_router = APIRouter(prefix='/transaction', tags=['transaction'])
 
-
+def get_next_current_antrian(db: Session) -> int:
+    # Get the maximum current_antrian value
+    max_current_antrian = db.query(Antrian.current_antrian).order_by(Antrian.current_antrian.desc()).first()
+    if max_current_antrian:
+        max_current_antrian = max_current_antrian[0]
+    else:
+        max_current_antrian = 0
+    
+    # Increment the value or set to 1 if already 10
+    return max_current_antrian + 1 if max_current_antrian < 10 else 1
 
 @transaction_router.post('/', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def create_transaction(
@@ -29,6 +38,15 @@ async def create_transaction(
 ):
     print(f"Received data: status={status}, jam={jam}, id_doctor={id_doctor}, id_pasien={id_pasien}, id_antrian={id_antrian}, tipe_pembayaran={tipe_pembayaran}, jumlah_pembayaran={jumlah_pembayaran}, id_user={id_user}, id_resep_digital={id_resep_digital}, id_catatan_dokter={id_catatan_dokter}")
     try:
+        # Get next current_antrian value
+        next_current_antrian = get_next_current_antrian(db)
+        # Update current_antrian for the specified id_antrian
+        antrian = db.query(Antrian).filter(Antrian.id_antrian == id_antrian).first()
+        if not antrian:
+            raise HTTPException(status_code=404, detail="Antrian not found")
+
+        antrian.current_antrian = next_current_antrian
+        
         new_transaction = RiwayatTransaksi(
             status=status,
             jam=jam,
