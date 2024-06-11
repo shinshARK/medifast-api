@@ -1,3 +1,4 @@
+import random  # For generating random numbers
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import select
@@ -247,9 +248,16 @@ async def update_transaction(
         if id_user is not None:
             transaction.id_user = id_user
         if id_resep_digital is not None:
-            transaction.id_resep_digital = id_resep_digital
+            if id_resep_digital == 0:
+                transaction.id_resep_digital = random.choice([1, 2, 3])
+            else:
+                transaction.id_resep_digital = id_resep_digital
+
         if id_catatan_dokter is not None:
-            transaction.id_catatan_dokter = id_catatan_dokter
+            if id_catatan_dokter == 0:
+                transaction.id_catatan_dokter = random.choice([1, 2, 3])
+            else:
+                transaction.id_catatan_dokter = id_catatan_dokter
 
         db.commit()
         db.refresh(transaction)
