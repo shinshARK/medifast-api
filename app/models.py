@@ -116,7 +116,7 @@ class Pasien(Base):
     nama_pasien = Column(String(255))
     umur = Column(Integer)
     jenis_kelamin = Column(String(255))
-    keluhan = Column(String(255))
+    # keluhan = Column(String(255))
     alamat = Column(String(255))
     # riwayat_transaksi = relationship("RiwayatTransaksi", back_populates="pasien")
     # resep_digital = relationship("ResepDigital", back_populates="pasien")

@@ -3,7 +3,9 @@
 # Libraries
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
+from starlette import status
+
 import os
 # App
 from app.database import get_db
@@ -22,19 +24,29 @@ async def get_all_pasien(db: Session = Depends(get_db)):
 
 @pasien_router.post('/', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def create_pasien(
+    response: Response,
     nama_pasien: str = Form(...),
     umur: int = Form(...),
     jenis_kelamin: str = Form(...),
-    keluhan: str = Form(...),
+    # keluhan: str = Form(...),
     alamat: str = Form(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
+    
+    existing_pasien = db.query(Pasien).filter(Pasien.nama_pasien == nama_pasien, Pasien.alamat == alamat).first()
+    if existing_pasien is not None:
+        response.status_code = status.HTTP_409_CONFLICT
+        return {
+            "message": "Patient already exists",
+            "id_pasien": existing_pasien.id_pasien,
+        }
+    
     new_pasien = Pasien(
         nama_pasien=nama_pasien,
         umur=umur,
         jenis_kelamin=jenis_kelamin,
-        keluhan=keluhan,
+        # keluhan=keluhan,
         alamat=alamat
     )
     db.add(new_pasien)
@@ -43,10 +55,8 @@ async def create_pasien(
     
     return {
         "message": "Patient created successfully",
-        "data": {
-            "id_pasien": new_pasien.id_pasien,
-            "nama_pasien": new_pasien.nama_pasien
-        },
+        "id_pasien": new_pasien.id_pasien,
+        "nama_pasien": new_pasien.nama_pasien
     }
 
 @pasien_router.get('/{id_pasien}', dependencies=[Depends(JWTBearer())])
