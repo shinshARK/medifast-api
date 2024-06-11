@@ -11,3 +11,10 @@ class CreateUserRequest(BaseModel):
 class LoginUserRequest(BaseModel):
     email: str
     password: str
+
+class UpdateUserRequest(BaseModel):
+    id: int
+    firstname: str
+    lastname: str
+    email: str
+    telephone: str

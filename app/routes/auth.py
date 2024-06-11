@@ -83,6 +83,37 @@ async def login(request: user_schema.LoginUserRequest,
         "tokens": {"access_token": access, "refresh_token": refresh},
     }
 
+@auth_router.put("/update", response_model=dict, dependencies=[Depends(JWTBearer())])
+async def update_user(
+    user: user_schema.UpdateUserRequest,
+    db: Session = Depends(get_db)
+):
+    existing_user = db.query(User).filter(User.id == user.id).first()
+    if not existing_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    # Update user details
+    existing_user.firstname = user.firstname
+    existing_user.lastname = user.lastname
+    existing_user.email = user.email
+    existing_user.telephone = user.telephone
+
+    db.commit()
+    db.refresh(existing_user)
+
+    return {
+        "message": "User updated successfully",
+        "user": {
+            "id": existing_user.id,
+            "firstname": existing_user.firstname,
+            "lastname": existing_user.lastname,
+            "email": existing_user.email,
+            "telephone": existing_user.telephone
+        }
+    }
+
+
+
 
 @auth_router.post('/logout')
 async def logout(token: str = Depends(JWTBearer()), db: Session = Depends(get_db)):
