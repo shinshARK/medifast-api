@@ -78,12 +78,13 @@ async def login(request: user_schema.LoginUserRequest,
             "id": user.id,
             "firstname": user.firstname,
             "lastname": user.lastname,
+            "telephone": user.telephone,
             "email": user.email
         },
         "tokens": {"access_token": access, "refresh_token": refresh},
     }
 
-@auth_router.put("/update", response_model=dict, dependencies=[Depends(JWTBearer())])
+@auth_router.put("/update", response_model=dict)
 async def update_user(
     user: user_schema.UpdateUserRequest,
     db: Session = Depends(get_db)
