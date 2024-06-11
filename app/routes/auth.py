@@ -99,10 +99,6 @@ async def update_user(
     existing_user.email = user.email
     existing_user.telephone = user.telephone
 
-    # Update hashed_password if a new password is provided
-    if user.password:
-        existing_user.hashed_password = get_hashed_password(user.password)
-
     db.commit()
     db.refresh(existing_user)
 
@@ -116,6 +112,8 @@ async def update_user(
             "telephone": existing_user.telephone
         }
     }
+
+
 
 
 
