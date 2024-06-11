@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import select
 from datetime import datetime
+import pytz  # Import pytz for timezone handling
 from fastapi.responses import FileResponse
 import os
 # App
@@ -25,19 +26,19 @@ def get_next_current_antrian(db: Session) -> int:
 @transaction_router.post('/', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def create_transaction(
     status: str = Form(...),
-    jam: str = Form(...),
+    # jam: str = Form(...),
     id_doctor: int = Form(...),
     id_pasien: int = Form(...),
     id_antrian: int = Form(...),
     tipe_pembayaran: str = Form(...),
     jumlah_pembayaran: str = Form(...),
     id_user: int = Form(...),
-    id_resep_digital: int = Form(...),
-    id_catatan_dokter: int = Form(...),
+    # id_resep_digital: int = Form(...),
+    # id_catatan_dokter: int = Form(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    print(f"Received data: status={status}, jam={jam}, id_doctor={id_doctor}, id_pasien={id_pasien}, id_antrian={id_antrian}, tipe_pembayaran={tipe_pembayaran}, jumlah_pembayaran={jumlah_pembayaran}, id_user={id_user}, id_resep_digital={id_resep_digital}, id_catatan_dokter={id_catatan_dokter}")
+    # print(f"Received data: status={status}, jam={jam}, id_doctor={id_doctor}, id_pasien={id_pasien}, id_antrian={id_antrian}, tipe_pembayaran={tipe_pembayaran}, jumlah_pembayaran={jumlah_pembayaran}, id_user={id_user}, id_resep_digital={id_resep_digital}, id_catatan_dokter={id_catatan_dokter}")
     try:
         # Get next current_antrian value
         next_current_antrian = get_next_current_antrian(db)
@@ -48,17 +49,21 @@ async def create_transaction(
 
         antrian.current_antrian = next_current_antrian
         
+        # Set jam to the current timestamp in Jakarta timezone
+        jakarta_tz = pytz.timezone('Asia/Jakarta')
+        current_time = datetime.now(jakarta_tz).strftime('%H:%M')
+        
         new_transaction = RiwayatTransaksi(
             status=status,
-            jam=jam,
+            jam=current_time,
             id_doctor=id_doctor,
             id_pasien=id_pasien,
             id_antrian=id_antrian,
             tipe_pembayaran=tipe_pembayaran,
             jumlah_pembayaran=jumlah_pembayaran,
             id_user=id_user,
-            id_resep_digital=id_resep_digital,
-            id_catatan_dokter=id_catatan_dokter
+            # id_resep_digital=id_resep_digital,
+            # id_catatan_dokter=id_catatan_dokter
         )
         db.add(new_transaction)
         db.commit()
