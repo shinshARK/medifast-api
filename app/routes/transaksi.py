@@ -124,8 +124,8 @@ async def get_all_transactions_by_user(user_id: int, db: Session = Depends(get_d
             "transaction": model_to_dict(transaction),
             "transaction_details": {
                 "user": model_to_dict(user),
-                "resep_digital": model_to_dict(resep_digital),
-                "catatan_dokter": model_to_dict(catatan_dokter),
+                "resep_digital": model_to_dict(resep_digital) if resep_digital else None,
+                "catatan_dokter": model_to_dict(catatan_dokter) if catatan_dokter else None,
                 "doctor": model_to_dict(doctor),
                 "pasien": model_to_dict(pasien),
                 "antrian": model_to_dict(antrian),    
@@ -136,6 +136,12 @@ async def get_all_transactions_by_user(user_id: int, db: Session = Depends(get_d
         formatted_transactions.append(formatted_transaction)
 
     return {"message": "Transactions retrieved successfully", "transactions": formatted_transactions}
+
+def model_to_dict(model):
+    if model is None:
+        return None
+    return {column.name: getattr(model, column.name) for column in model.__table__.columns}
+
 
 # READ a specific transaction by ID with join
 # @transaction_router.get('/{transaction_id}', dependencies=[Depends(JWTBearer())])
