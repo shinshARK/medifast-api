@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import logging
 
 # Define the SQLite database URL
-SQLALCHEMY_DATABASE_URL = "sqlite:///medifastfrfr.db"  # Replace with the path to your SQLite database file
+SQLALCHEMY_DATABASE_URL = "sqlite:///medifastForeal.db"  # Replace with the path to your SQLite database file
 logging.basicConfig()
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 # Create a SQLAlchemy engine

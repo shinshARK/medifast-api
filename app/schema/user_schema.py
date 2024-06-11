@@ -18,3 +18,4 @@ class UpdateUserRequest(BaseModel):
     lastname: str
     email: str
     telephone: str
+    password: str

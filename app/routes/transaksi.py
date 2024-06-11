@@ -211,16 +211,16 @@ def model_to_dict(model):
 @transaction_router.put('/{transaction_id}', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def update_transaction(
     transaction_id: int,
-    status: str = Form(...),
-    jam: str = Form(...),
-    id_doctor: int = Form(...),
-    id_pasien: int = Form(...),
-    id_antrian: int = Form(...),
-    tipe_pembayaran: str = Form(...),
-    jumlah_pembayaran: str = Form(...),
-    id_user: int = Form(...),
-    id_resep_digital: int = Form(...),
-    id_catatan_dokter: int = Form(...),
+    status: str = Form(None),
+    jam: str = Form(None),
+    id_doctor: int = Form(None),
+    id_pasien: int = Form(None),
+    id_antrian: int = Form(None),
+    tipe_pembayaran: str = Form(None),
+    jumlah_pembayaran: str = Form(None),
+    id_user: int = Form(None),
+    id_resep_digital: int = Form(None),
+    id_catatan_dokter: int = Form(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -229,27 +229,37 @@ async def update_transaction(
         if not transaction:
             raise HTTPException(status_code=404, detail="Transaction not found")
 
-        # Update transaction details
-        transaction.status = status
-        transaction.jam = jam
-        transaction.id_doctor = id_doctor
-        transaction.id_pasien = id_pasien
-        transaction.id_antrian = id_antrian
-        transaction.tipe_pembayaran = tipe_pembayaran
-        transaction.jumlah_pembayaran = jumlah_pembayaran
-        transaction.id_user = id_user
-        transaction.id_resep_digital = id_resep_digital
-        transaction.id_catatan_dokter = id_catatan_dokter
+        # Update transaction details only if they are provided
+        if status is not None:
+            transaction.status = status
+        if jam is not None:
+            transaction.jam = jam
+        if id_doctor is not None:
+            transaction.id_doctor = id_doctor
+        if id_pasien is not None:
+            transaction.id_pasien = id_pasien
+        if id_antrian is not None:
+            transaction.id_antrian = id_antrian
+        if tipe_pembayaran is not None:
+            transaction.tipe_pembayaran = tipe_pembayaran
+        if jumlah_pembayaran is not None:
+            transaction.jumlah_pembayaran = jumlah_pembayaran
+        if id_user is not None:
+            transaction.id_user = id_user
+        if id_resep_digital is not None:
+            transaction.id_resep_digital = id_resep_digital
+        if id_catatan_dokter is not None:
+            transaction.id_catatan_dokter = id_catatan_dokter
 
         db.commit()
         db.refresh(transaction)
 
         return {
             "message": "Transaction updated successfully",
-            "data":{
-            "id_transakasi": transaction.id_riwayat_transaksi,
-            "id_user": transaction.id_user
-        },
+            "data": {
+                "id_transaksi": transaction.id_riwayat_transaksi,
+                "id_user": transaction.id_user
+            }
         }
     except HTTPException as http_error:
         raise http_error
