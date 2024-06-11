@@ -34,7 +34,8 @@ async def create_transaction(
     id_user: int = Form(...),
     id_resep_digital: int = Form(...),
     id_catatan_dokter: int = Form(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     print(f"Received data: status={status}, jam={jam}, id_doctor={id_doctor}, id_pasien={id_pasien}, id_antrian={id_antrian}, tipe_pembayaran={tipe_pembayaran}, jumlah_pembayaran={jumlah_pembayaran}, id_user={id_user}, id_resep_digital={id_resep_digital}, id_catatan_dokter={id_catatan_dokter}")
     try:
@@ -67,7 +68,10 @@ async def create_transaction(
 
     return {
         "message": "Transaction created successfully",
-        "data": new_transaction
+        "data": {
+            "id_transakasi": new_transaction.id_riwayat_transaksi,
+            "id_user": new_transaction.id_user
+        },
     }
 
 
@@ -142,49 +146,118 @@ async def get_all_transactions_by_user(user_id: int, db: Session = Depends(get_d
 #     return {"message": "Transaction retrieved successfully", "transaction": transaction}
 
 # UPDATE a transaction by ID
+# @transaction_router.put('/{transaction_id}', response_model=dict, dependencies=[Depends(JWTBearer())])
+# async def update_transaction(
+#     transaction_id: int,
+#     status: str,
+#     jam: str,
+#     id_doctor: int,
+#     id_pasien: int,
+#     id_antrian: int,
+#     tipe_pembayaran: str,
+#     jumlah_pembayaran: str,
+#     id_user: int,
+#     id_resep_digital: int,
+#     id_catatan_doctor: int,
+#     db: Session = Depends(get_db)
+# ):
+#     transaction = db.query(RiwayatTransaksi).filter(RiwayatTransaksi.id == transaction_id).first()
+#     if not transaction:
+#         raise HTTPException(status_code=404, detail="Transaction not found")
+    
+#     transaction.status = status
+#     transaction.jam = jam
+#     transaction.doctor_id = id_doctor
+#     transaction.pasien_id = id_pasien
+#     transaction.antrian_id = id_antrian
+#     transaction.tipe_pembayaran = tipe_pembayaran
+#     transaction.jumlah_pembayaran = jumlah_pembayaran
+#     transaction.user_id = id_user
+#     transaction.resep_digital_id = id_resep_digital
+#     transaction.catatan_doctor_id = id_catatan_doctor
+    
+#     db.commit()
+#     db.refresh(transaction)
+    
+#     return {"message": "Transaction updated successfully", "data": transaction}
+
+# # DELETE a transaction by ID
+# @transaction_router.delete('/{transaction_id}', response_model=dict, dependencies=[Depends(JWTBearer())])
+# async def delete_transaction(transaction_id: int, db: Session = Depends(get_db)):
+#     transaction = db.query(RiwayatTransaksi).filter(RiwayatTransaksi.id == transaction_id).first()
+#     if not transaction:
+#         raise HTTPException(status_code=404, detail="Transaction not found")
+    
+#     db.delete(transaction)
+#     db.commit()
+    
+#     return {"message": "Transaction deleted successfully"}
+
 @transaction_router.put('/{transaction_id}', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def update_transaction(
     transaction_id: int,
-    status: str,
-    jam: str,
-    id_doctor: int,
-    id_pasien: int,
-    id_antrian: int,
-    tipe_pembayaran: str,
-    jumlah_pembayaran: str,
-    id_user: int,
-    id_resep_digital: int,
-    id_catatan_doctor: int,
-    db: Session = Depends(get_db)
+    status: str = Form(...),
+    jam: str = Form(...),
+    id_doctor: int = Form(...),
+    id_pasien: int = Form(...),
+    id_antrian: int = Form(...),
+    tipe_pembayaran: str = Form(...),
+    jumlah_pembayaran: str = Form(...),
+    id_user: int = Form(...),
+    id_resep_digital: int = Form(...),
+    id_catatan_dokter: int = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    transaction = db.query(RiwayatTransaksi).filter(RiwayatTransaksi.id == transaction_id).first()
-    if not transaction:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-    
-    transaction.status = status
-    transaction.jam = jam
-    transaction.doctor_id = id_doctor
-    transaction.pasien_id = id_pasien
-    transaction.antrian_id = id_antrian
-    transaction.tipe_pembayaran = tipe_pembayaran
-    transaction.jumlah_pembayaran = jumlah_pembayaran
-    transaction.user_id = id_user
-    transaction.resep_digital_id = id_resep_digital
-    transaction.catatan_doctor_id = id_catatan_doctor
-    
-    db.commit()
-    db.refresh(transaction)
-    
-    return {"message": "Transaction updated successfully", "data": transaction}
+    try:
+        transaction = db.query(RiwayatTransaksi).filter(RiwayatTransaksi.id_riwayat_transaksi == transaction_id).first()
+        if not transaction:
+            raise HTTPException(status_code=404, detail="Transaction not found")
 
-# DELETE a transaction by ID
+        # Update transaction details
+        transaction.status = status
+        transaction.jam = jam
+        transaction.id_doctor = id_doctor
+        transaction.id_pasien = id_pasien
+        transaction.id_antrian = id_antrian
+        transaction.tipe_pembayaran = tipe_pembayaran
+        transaction.jumlah_pembayaran = jumlah_pembayaran
+        transaction.id_user = id_user
+        transaction.id_resep_digital = id_resep_digital
+        transaction.id_catatan_dokter = id_catatan_dokter
+
+        db.commit()
+        db.refresh(transaction)
+
+        return {
+            "message": "Transaction updated successfully",
+            "data":{
+            "id_transakasi": transaction.id_riwayat_transaksi,
+            "id_user": transaction.id_user
+        },
+        }
+    except HTTPException as http_error:
+        raise http_error
+    except Exception as e:
+        db.rollback()  # Rollback in case of error
+        raise HTTPException(status_code=500, detail=f"Error updating transaction: {e}")
+
+
 @transaction_router.delete('/{transaction_id}', response_model=dict, dependencies=[Depends(JWTBearer())])
 async def delete_transaction(transaction_id: int, db: Session = Depends(get_db)):
-    transaction = db.query(RiwayatTransaksi).filter(RiwayatTransaksi.id == transaction_id).first()
-    if not transaction:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-    
-    db.delete(transaction)
-    db.commit()
-    
-    return {"message": "Transaction deleted successfully"}
+    try:
+        transaction = db.query(RiwayatTransaksi).filter(RiwayatTransaksi.id_riwayat_transaksi == transaction_id).first()
+        if not transaction:
+            raise HTTPException(status_code=404, detail="Transaction not found")
+
+        db.delete(transaction)
+        db.commit()
+
+        return {
+            "message": "Transaction deleted successfully"
+        }
+    except HTTPException as http_error:
+        raise http_error
+    except Exception as e:
+        db.rollback()  # Rollback in case of error
+        raise HTTPException(status_code=500, detail=f"Error deleting transaction: {e}")
