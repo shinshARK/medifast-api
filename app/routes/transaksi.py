@@ -244,7 +244,10 @@ async def update_transaction(
         if tipe_pembayaran is not None:
             transaction.tipe_pembayaran = tipe_pembayaran
         if jumlah_pembayaran is not None:
-            transaction.jumlah_pembayaran = jumlah_pembayaran
+            if jumlah_pembayaran == "0":
+                transaction.jumlah_pembayaran = random.choice([1, 2, 3,4,5,6,7,8,9,10]) * 100000
+            else:
+                transaction.jumlah_pembayaran = jumlah_pembayaran
         if id_user is not None:
             transaction.id_user = id_user
         if id_resep_digital is not None:
